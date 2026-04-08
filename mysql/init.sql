@@ -1,0 +1,10 @@
+CREATE DATABASE IF NOT EXISTS hmis;
+
+USE hmis;
+
+CREATE TABLE patients (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    age INT,
+    disease VARCHAR(255)
+);
