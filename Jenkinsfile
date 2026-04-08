@@ -40,7 +40,22 @@ pipeline {
                 sh 'docker push $FRONTEND_IMAGE'
             }
         }
-
+        
+		stage('Reset MySQL') {
+            steps {
+                sh '''
+                kubectl delete deployment mysql || true
+                kubectl delete pvc --all || true
+               '''
+            }
+        }
+		
+	    stage('Create ConfigMap') {
+            steps {
+                sh 'kubectl apply -f k8s/mysql-configmap.yaml'
+            }
+        }	
+		
         stage('Deploy MySQL') {
             steps {
                 sh 'kubectl apply -f k8s/mysql-deployment.yaml'
@@ -62,12 +77,6 @@ pipeline {
             }
         }
 		
-	    stage('Create ConfigMap') {
-            steps {
-                sh 'kubectl apply -f k8s/mysql-configmap.yaml'
-            }
-        }
-
         stage('Deploy Monitoring') {
             steps {
                 sh '''
