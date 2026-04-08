@@ -4,6 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = "rajeevreddy1511/patient-service:latest"
         FRONTEND_IMAGE = "rajeevreddy1511/hmis-frontend:latest"
+        KUBECONFIG = "/var/lib/jenkins/.kube/config"
     }
 
     stages {
