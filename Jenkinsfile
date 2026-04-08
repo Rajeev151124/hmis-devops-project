@@ -61,6 +61,12 @@ pipeline {
                 sh 'kubectl apply -f k8s/frontend-service.yaml'
             }
         }
+		
+	    stage('Create ConfigMap') {
+            steps {
+                sh 'kubectl apply -f k8s/mysql-configmap.yaml'
+            }
+        }
 
         stage('Deploy Monitoring') {
             steps {
