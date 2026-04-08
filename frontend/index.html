@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HMIS - Patient Registration</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 40px;
+            background-color: #f4f4f4;
+        }
+        h2 {
+            color: #333;
+        }
+        input {
+            padding: 10px;
+            margin: 5px;
+        }
+        button {
+            padding: 10px;
+            background-color: blue;
+            color: white;
+            border: none;
+        }
+        table {
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 60%;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>Patient Registration</h2>
+
+<input type="text" id="name" placeholder="Name">
+<input type="number" id="age" placeholder="Age">
+<input type="text" id="disease" placeholder="Disease">
+
+<button onclick="addPatient()">Add Patient</button>
+
+<h2>Patient List</h2>
+<table id="patientTable">
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Disease</th>
+    </tr>
+</table>
+
+<script>
+
+const API_URL = "http://13.201.81.162:30007";
+
+function addPatient() {
+    const name = document.getElementById("name").value;
+    const age = document.getElementById("age").value;
+    const disease = document.getElementById("disease").value;
+
+    fetch(`${API_URL}/patients`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name, age, disease })
+    })
+    .then(() => {
+        alert("Patient Added!");
+        loadPatients();
+    });
+}
+
+function loadPatients() {
+    fetch(`${API_URL}/patients`)
+    .then(res => res.json())
+    .then(data => {
+        const table = document.getElementById("patientTable");
+
+        // Clear old rows
+        table.innerHTML = `
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Disease</th>
+            </tr>
+        `;
+
+        data.forEach(p => {
+            table.innerHTML += `
+                <tr>
+                    <td>${p.id}</td>
+                    <td>${p.name}</td>
+                    <td>${p.age}</td>
+                    <td>${p.disease}</td>
+                </tr>
+            `;
+        });
+    });
+}
+
+loadPatients();
+
+</script>
+
+</body>
+</html>
