@@ -40,8 +40,8 @@ pipeline {
                 sh 'docker push $FRONTEND_IMAGE'
             }
         }
-        
-		stage('Reset MySQL') {
+
+                stage('Reset MySQL') {
             steps {
                 sh '''
                 kubectl delete deployment mysql || true
@@ -49,13 +49,13 @@ pipeline {
                '''
             }
         }
-		
-	    stage('Create ConfigMap') {
+
+            stage('Create ConfigMap') {
             steps {
                 sh 'kubectl apply -f k8s/mysql-configmap.yaml'
             }
-        }	
-		
+        }
+
         stage('Deploy MySQL') {
             steps {
                 sh 'kubectl apply -f k8s/mysql-deployment.yaml'
@@ -77,6 +77,13 @@ pipeline {
             }
         }
 		
+		stage('Deploy Appointment Service') {
+            steps {
+                sh 'kubectl apply -f k8s/appointment-deployment.yaml'
+                sh 'kubectl apply -f k8s/appointment-service.yaml'
+            }
+        }
+
         stage('Deploy Monitoring') {
             steps {
                 sh '''
@@ -88,3 +95,4 @@ pipeline {
         }
     }
 }
+

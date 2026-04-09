@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: rajeevreddy1511/hmis-frontend:latest
+        image: rajeevreddy1511/hmis-frontend:v2
         ports:
         - containerPort: 80

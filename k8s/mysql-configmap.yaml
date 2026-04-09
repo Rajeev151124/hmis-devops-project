@@ -6,9 +6,18 @@ data:
   init.sql: |
     CREATE DATABASE IF NOT EXISTS hmis;
     USE hmis;
+
     CREATE TABLE IF NOT EXISTS patients (
       id INT AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR(255),
       age INT,
       disease VARCHAR(255)
     );
+
+    CREATE TABLE IF NOT EXISTS appointments (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      patient_name VARCHAR(255),
+      doctor_name VARCHAR(255),
+      date VARCHAR(50)
+    );
+
