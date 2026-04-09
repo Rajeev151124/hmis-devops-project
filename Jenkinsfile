@@ -41,58 +41,65 @@ pipeline {
             }
         }
 
-                stage('Reset MySQL') {
-            steps {
-                sh '''
-                kubectl delete deployment mysql || true
-                kubectl delete pvc --all || true
-               '''
-            }
-        }
-
-            stage('Create ConfigMap') {
+        
+        stage('Create ConfigMap') {
             steps {
                 sh 'kubectl apply -f k8s/mysql-configmap.yaml'
             }
         }
 
-        stage('Deploy MySQL') {
+        stage('Deploy MySQL (Safe)') {
             steps {
                 sh 'kubectl apply -f k8s/mysql-deployment.yaml'
                 sh 'kubectl apply -f k8s/mysql-service.yaml'
             }
         }
 
-        stage('Deploy Backend') {
+        stage('Deploy Backend (Rolling Update)') {
             steps {
                 sh 'kubectl apply -f k8s/patient-deployment.yaml'
                 sh 'kubectl apply -f k8s/patient-service.yaml'
+                sh 'kubectl rollout restart deployment patient-service'
             }
         }
 
-        stage('Deploy Frontend') {
+        stage('Deploy Frontend (Rolling Update)') {
             steps {
                 sh 'kubectl apply -f k8s/frontend-deployment.yaml'
                 sh 'kubectl apply -f k8s/frontend-service.yaml'
-            }
-        }
-		
-		stage('Deploy Appointment Service') {
-            steps {
-                sh 'kubectl apply -f k8s/appointment-deployment.yaml'
-                sh 'kubectl apply -f k8s/appointment-service.yaml'
+                sh 'kubectl rollout restart deployment frontend'
             }
         }
 
-        stage('Deploy Monitoring') {
+        stage('Deploy Appointment Service (Rolling Update)') {
+            steps {
+                sh 'kubectl apply -f k8s/appointment-deployment.yaml'
+                sh 'kubectl apply -f k8s/appointment-service.yaml'
+                sh 'kubectl rollout restart deployment appointment-service'
+            }
+        }
+
+        stage('Deploy Monitoring (Idempotent)') {
             steps {
                 sh '''
                 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts || true
                 helm repo update
-                helm install monitoring prometheus-community/kube-prometheus-stack || true
+                helm upgrade --install monitoring prometheus-community/kube-prometheus-stack
                 '''
             }
         }
+
+        stage('Verify Deployment') {
+            steps {
+                sh 'kubectl get pods'
+                sh 'kubectl get svc'
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline completed successfully.'
+        }
     }
 }
-
